@@ -65,7 +65,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p release
-          find versions/26.1/build/libs -maxdepth 1 -type f -name 're-play-mod-*.jar' ! -name '*-sources.jar' -exec cp {} release/ \;
+          find versions/26.1/build/libs -maxdepth 1 -type f -name 're-play-mod-*.jar' ! -name '*-sources.jar' ! -name '*-raw.jar' -exec cp {} release/ \;
           test "$(find release -maxdepth 1 -name '*.jar' | wc -l)" -ge 1
           sha256sum release/*.jar > release/SHA256SUMS.txt
 
