@@ -62,7 +62,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          name: Re:Play Mod ${{ github.ref_name }} for Minecraft 26.1.2
+          name: "Re:Play Mod ${{ github.ref_name }} for Minecraft 26.1.2"
           body_path: RELEASE_NOTES.md
           files: release/*
           generate_release_notes: true
