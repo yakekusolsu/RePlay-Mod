@@ -33,6 +33,12 @@ jobs:
           distribution: temurin
           java-version: "8"
 
+      - name: Install JDK 16 for Minecraft 1.17 preprocessing
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "16"
+
       - name: Set up JDK 21 as the build JVM
         uses: actions/setup-java@v5
         with:
