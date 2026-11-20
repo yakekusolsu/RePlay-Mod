@@ -27,7 +27,13 @@ jobs:
           git submodule set-url src/main/resources/assets/replaymod/lang https://github.com/ReplayMod/Translations.git
           git submodule update --init --recursive --depth 1
 
-      - name: Set up JDK 21
+      - name: Install JDK 8 for legacy preprocessing
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "8"
+
+      - name: Set up JDK 21 as the build JVM
         uses: actions/setup-java@v5
         with:
           distribution: temurin
