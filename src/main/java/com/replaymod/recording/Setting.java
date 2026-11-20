@@ -7,7 +7,8 @@ public final class Setting<T> extends SettingsRegistry.SettingKeys<T> {
     public static final Setting<Boolean> RECORD_SERVER = make("recordServer", "recordserver", true);
     public static final Setting<Boolean> INDICATOR = make("indicator", "indicator", true);
     public static final Setting<Boolean> AUTO_START_RECORDING = make("autoStartRecording", "autostartrecording", true);
-    public static final Setting<Boolean> AUTO_POST_PROCESS = make("autoPostProcess", null, true);
+    // Post-processing can temporarily hold substantial replay state. Keep it opt-in on the low-memory build.
+    public static final Setting<Boolean> AUTO_POST_PROCESS = make("autoPostProcess", null, false);
     public static final Setting<Boolean> RENAME_DIALOG = make("renameDialog", "rename_recording_dialog", true);
 
     private static <T> Setting<T> make(String key, String displayName, T defaultValue) {

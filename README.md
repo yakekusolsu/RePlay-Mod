@@ -1,62 +1,50 @@
-# ReplayMod
-A Minecraft mod to record game sessions and replay them afterwards from any perspective.
+# Re:Play Mod
 
-## Building
-Make sure your sub-projects are up-to-date: `git submodule update --init --recursive`
+Re:Play Mod is a low-memory derivative of [ReplayMod](https://github.com/ReplayMod/ReplayMod), aimed at Minecraft
+players using PCs with about 4 GB of system RAM. It retains ReplayMod's features while changing the unsafe memory
+defaults that matter most on constrained systems.
 
-For compiling 1.7.10, you must run `./gradlew :jGui:1.7.10:setupDecompWorkspace :1.7.10:setupDecompWorkspace` once after the initial clone. This may take quite some time.
+## Low-memory changes
 
-### No IDE
-You can build the mod by running `./gradlew build` (or just `./gradlew bundleJar`). You can then find the final jar files in `versions/$MCVERSION/build/libs/`.
-You can also build single versions by running `./gradlew :1.8:build` (or just `./gradlew :1.8:bundleJar`) (builds the MC 1.8 version).
+- The recording writer has a bounded 32-packet queue. If storage cannot keep up, recording applies back-pressure
+  instead of retaining an unlimited number of packets until the game runs out of memory.
+- Automatic replay post-processing is off by default. It can still be enabled in the recording settings.
+- Gradle uses a 1.2 GB heap, one worker, no parallel execution and no persistent daemon.
+- The produced archive is named `re-play-mod-<minecraft>-<version>.jar` and the in-game name is **Re:Play Mod**.
 
-### IntelliJ
-Ensure you have at least IDEA 2020.1.
-Build the mod via Gradle as explained above at least once (`./gradlew compileJava` should be sufficient). This will ensure that the sources for all MC versions are generated.
-Then import the Gradle project from within IDEA: File -> Open -> build.gradle -> Open as Project
-Finally configure IDEA to build everything by itself instead of delegating it to Gradle (cause that is slow): File -> Settings -> Build, Execution, Deployment -> Build Tools -> Gradle -> Build and run using: IntelliJ IDEA
+The internal mod id and resource namespace remain `replaymod`. This preserves `.mcpr` compatibility, existing
+configuration and third-party integrations. Do not install Re:Play Mod and upstream ReplayMod together.
 
-### Eclipse
+## Recommended 4 GB setup
 
-## Development
-### Branches
-Loosely based on [this branching model](http://nvie.com/posts/a-successful-git-branching-model/) with `stable` instead of `master`.
+- Allocate **1536 MB** to Minecraft. Do not exceed 2 GB on a 4 GB system.
+- Use Fabric with Sodium and Lithium where those mods support your Minecraft version.
+- Keep render distance at 6-8 chunks and simulation distance at 5 chunks.
+- Close browsers and launchers after Minecraft starts.
+- Export video after closing other programs. FFmpeg rendering still needs substantial CPU, disk space and memory.
 
-TL;DR:
-Main development happens on the `develop` branch, snapshots are built from this branch.
-The `stable` branch contains the most recent release.
+These changes cap Re:Play Mod's recording backlog; they cannot make modern Minecraft itself fit every 4 GB computer.
+Recording on a slow HDD may briefly reduce FPS when the queue applies back-pressure, which is preferable to a crash.
 
-The `master` branch is solely to be used for the `version.json` file that contains a list of all versions
-used by the clients to check for updates of this mod.
+## Building one Minecraft version
 
-### The Preprocessor
-To support multiple Minecraft versions with the ReplayMod, a [JCP](https://github.com/raydac/java-comment-preprocessor)-inspired preprocessor is used.
-It has by now acquired a lot more sophisticated features to make it as noninvasive as possible.
-Please read the [preprocessor's README](https://github.com/ReplayMod/preprocessor/blob/master/README.md) to understand how it works.
+Use JDK 21, initialize submodules, then build only the version you need:
 
-### Versioning
-The ReplayMod uses the versioning scheme outlined [here](https://docs.minecraftforge.net/en/1.12.x/conventions/versioning/)
-with three changes:
-- No `MAJORAPI`, the ReplayMod does not provide any external API
-- "Updating to a new Minecraft version" should not increment `MAJORMOD`, we maintain one version of the ReplayMod
-for each version of Minecraft and all these versions share the same feature set (and most bugs). We therefore try to
-keep the version name the same for all of them (with the exception of `MCVERSION` of course). This also means that the
-"Multiple Minecraft Version" section does not apply.
-- For pre-releases the shorter `-bX` is used instead of `-betaX`
+```text
+git submodule update --init --recursive
+./gradlew :1.21.11:build
+```
 
-When a new version is (pre-)release, a new commit modifying the `version.txt` file should be added and the
-`versions.json` file in the `master` branch should be updated. To simplify this process the gradle task `doRelease` can
-be used: `./gradlew -PreleaseVersion=2.0.0-rc1 doRelease`. It will create the commit and update the version.json
-accordingly.
+For Minecraft 26.1.2, use the upstream `26.1` target (Minecraft patch releases share that target):
 
-Care should be taken that the updated `version.json` is not pushed before a jar file is available on the
-download page (or Jenkins) as it will inform the users of the update.
+```text
+./gradlew :26.1:build
+```
 
-### Bugs
-GitHub should generally be used to report bugs.
+Building all supported Minecraft versions is not suitable for a 4 GB PC. Output is written under
+`versions/<minecraft-version>/build/libs/`.
 
-In the past, bugs were tracked via [Bugzilla](https://bugs.replaymod.com/), so bug numbers in commits prior to 2020 such as `(fixes #42)` generally referred to Bugzilla unless noted otherwise.
+## License and attribution
 
-## License
-The ReplayMod is provided under the terms of the GNU General Public License Version 3 or (at your option) any later version.
-See `LICENSE.md` for the full license text.
+Re:Play Mod is based on ReplayMod by CrushedPixel, johni0702 and contributors. It is distributed under the GNU General
+Public License, version 3 or (at your option) any later version. See `LICENSE.md` and `NOTICE.md`.

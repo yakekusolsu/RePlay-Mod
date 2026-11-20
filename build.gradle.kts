@@ -19,7 +19,7 @@ if (jGuiVersion in listOf("1.12.1", "1.12.2")) jGuiVersion = "1.12"
 val jGui = project.evaluationDependsOn(":jGui:$jGuiVersion")
 
 version = "${project.name}-${rootProject.version}"
-base.archivesName.set("replaymod")
+base.archivesName.set("re-play-mod")
 java.withSourcesJar()
 
 loom {

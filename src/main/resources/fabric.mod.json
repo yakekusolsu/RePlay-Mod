@@ -3,14 +3,15 @@
   "id": "replaymod",
   "version": "${version}",
 
-  "name": "Replay Mod",
-  "description": "A Mod which allows you to record, replay and share your Minecraft experience.",
+  "name": "Re:Play Mod",
+  "description": "A low-memory Replay Mod derivative for PCs with about 4 GB of RAM.",
   "authors": [
     "CrushedPixel",
-    "johni0702"
+    "johni0702",
+    "Re:Play Mod contributors"
   ],
   "contact": {
-    "homepage": "https://replaymod.com/",
+    "homepage": "https://github.com/ReplayMod/ReplayMod",
     "sources": "https://github.com/ReplayMod/ReplayMod"
   },
 

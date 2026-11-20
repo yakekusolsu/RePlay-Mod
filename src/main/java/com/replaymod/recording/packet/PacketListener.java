@@ -88,7 +88,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -118,7 +119,24 @@ public class PacketListener extends ChannelInboundHandlerAdapter {
 
     private final ResourcePackRecorder resourcePackRecorder;
 
-    private final ExecutorService saveService = Executors.newSingleThreadExecutor();
+    /**
+     * A bounded writer queue is essential on low-memory machines. The upstream single-thread executor uses an
+     * unbounded queue, so a busy server or slow disk can retain packets until the JVM runs out of memory. Once this
+     * small queue fills, CallerRunsPolicy applies back-pressure to the producer instead of retaining more packets.
+     */
+    private final ExecutorService saveService = new ThreadPoolExecutor(
+            1,
+            1,
+            0L,
+            TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<>(32),
+            runnable -> {
+                Thread thread = new Thread(runnable, "RePlay-Mod-Writer");
+                thread.setDaemon(true);
+                return thread;
+            },
+            new ThreadPoolExecutor.CallerRunsPolicy()
+    );
     private final ReplayOutputStream packetOutputStream;
 
     private ReplayMetaData metaData;
@@ -162,7 +180,7 @@ public class PacketListener extends ChannelInboundHandlerAdapter {
                         metaData.setFileFormat("MCPR");
                         metaData.setFileFormatVersion(ReplayMetaData.CURRENT_FILE_FORMAT_VERSION);
                         metaData.setProtocolVersion(MCVer.getProtocolVersion());
-                        metaData.setGenerator("ReplayMod in Minimal Mode");
+                        metaData.setGenerator("Re:Play Mod in Minimal Mode");
 
                         try (OutputStream out = replayFile.write("metaData.json")) {
                             String json = (new Gson()).toJson(metaData);
