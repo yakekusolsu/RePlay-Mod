@@ -18,8 +18,14 @@ jobs:
     steps:
       - name: Check out source and submodules
         uses: actions/checkout@v6
-        with:
-          submodules: recursive
+
+      - name: Check out upstream submodules
+        shell: bash
+        run: |
+          git submodule set-url jGui https://github.com/ReplayMod/jGui.git
+          git submodule set-url libs/ReplayStudio https://github.com/ReplayMod/ReplayStudio.git
+          git submodule set-url src/main/resources/assets/replaymod/lang https://github.com/ReplayMod/Translations.git
+          git submodule update --init --recursive --depth 1
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5
